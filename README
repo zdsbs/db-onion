@@ -1,0 +1,19 @@
+			
+
+TODO:
+	DB Onion should automatically update your version number
+	Reads scripts from disk and applies them in order to a db
+	If you're missing a version you have 1,2,4 provide error feedback!
+	build a jar of db onion
+	create ant task for db onion - If there was error feedback stop build?
+	configure db connection information
+	If DB is not configured to be versioned (ie no version table) provide error feedback	
+	Specifying / configuring the script directory
+	Commit after each script
+	On exception don't commit the script + don't process future scripts
+	Apply only scripts that need to be applied (if version is at 4 start applying script 5)
+	When everything works print "yay we applied n-n'"
+
+For Testing
+	1) use an in memory db
+
