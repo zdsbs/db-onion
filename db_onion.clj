@@ -4,7 +4,7 @@
 (def script-file-filter 
   (proxy [FilenameFilter] []
     (accept [_ filename] 
-          (if (nil? (re-find #"[0-9]+-.*sql$" filename))
+          (if (nil? (re-find #"^[0-9]+-.*sql$" filename))
             false
             true))))
 

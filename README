@@ -1,4 +1,4 @@
-			
+Done:			
 
 TODO:
 	DB Onion should automatically update your version number
@@ -14,6 +14,4 @@ TODO:
 	Apply only scripts that need to be applied (if version is at 4 start applying script 5)
 	When everything works print "yay we applied n-n'"
 
-For Testing
-	1) use an in memory db
 
