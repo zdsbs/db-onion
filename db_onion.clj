@@ -17,4 +17,10 @@
 
 (defn get-scripts [script-dir-path]
     (let [onion (new File script-dir-path)]
-          (sort numeric-sort-comparator (seq (.listFiles onion script-file-filter)))))
+         (sort numeric-sort-comparator (seq (.listFiles onion script-file-filter)))))
+
+
+(defn run [script-dir-path con]
+  (let [sst (.createStatement con)]
+    (.execute sst "UPDATE version set version=1")
+    (.close sst)))
