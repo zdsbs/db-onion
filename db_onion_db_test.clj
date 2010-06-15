@@ -5,40 +5,66 @@
      (java.io File FileWriter)))
 
 (Class/forName "org.h2.Driver")
-(def con (DriverManager/getConnection "jdbc:h2:mem:mytest","sa",""))
-(def sst (.createStatement con))
+
+(dosync
+	(ref-set con (DriverManager/getConnection "jdbc:h2:mem:mytest","sa","")))
 
 (def db-onion-test-dir "db-onion-test-dir")
 
+(defn create-script[name contents]
+	  (def script-file (File. (str db-onion-test-dir "/" name)))
+	  (.createNewFile script-file)
+	  (def writer (FileWriter. script-file))
+	  (.write writer contents)
+	  (.close writer))
+
+
+
 (defn create-db-fixture [test-fn]
-    (.execute sst "CREATE TABLE version (version INTEGER)")
-    (.execute sst "INSERT INTO version values (0)")
-    (test-fn)
-    (.execute sst "DROP TABLE version")
-    (.close sst))
+	(def sst (.createStatement @con))
+	(.execute sst "CREATE TABLE version (version INTEGER)")
+	(.execute sst "INSERT INTO version values (0)")
+	(.execute sst "CREATE TABLE script_numbers (script_number INTEGER, insertion_time TIMESTAMP default current_timestamp)")
+	(test-fn)
+	(.execute sst "drop all objects;")
+	(.close sst))
 
 (defn create-file-fixture [test-fn]
   (def test-dir (File. db-onion-test-dir))
   (.mkdir test-dir)
-
-  (def do-nothing-file (File. (str db-onion-test-dir "/1-do-nothing-file.sql")))
-  (.createNewFile do-nothing-file)
-
-  (def writer (FileWriter. do-nothing-file))
-
-  (.write writer "--")
-  (.close writer)
-  
+	(create-script "1-script.sql" "INSERT INTO script_numbers (script_number) values (1)")
+	(create-script "2-script.sql" "INSERT INTO script_numbers (script_number) values (2)")
+	(create-script "3-script.sql" "INSERT INTO script_numbers (script_number) values (3)")
+	(create-script "4-script.sql" "INSERT INTO script_numbers (script_number) values (4)")
   (test-fn)
+	(doseq [test-file (.listFiles test-dir)]
+		(.delete test-file))
+  (.delete test-dir)
+)
 
-  (.delete do-nothing-file)
-  (.delete test-dir))
+(defn initialize-version [number]
+	(.execute sst (str "update version set version=" number)))
 
-(deftest apply-one-script-version-should-be-1
-  (run db-onion-test-dir con)
-    (let [rs (.executeQuery sst "SELECT version from version")]
-      (.next rs)
-      (is (= 1 (.getObject rs "version")))))
+(defn get-ran-script-nums []
+	(let [rs (.executeQuery sst "SELECT script_number from script_numbers order by insertion_time")]
+				(loop [results []]
+					(if (not (.next rs))
+						results
+						(recur (conj results (.getObject rs "script_number")))
+					))))
+
+(deftest apply-all-scripts
+  (run db-onion-test-dir)
+	(is (= (get-ran-script-nums) [1 2 3 4])
+	(is (= 4 (get-version-number)))))
+
+(deftest apply-scripts-3-and-4-when-version-starts-at-2
+	(initialize-version 2)
+  (run db-onion-test-dir)
+	(is (= (get-ran-script-nums) [3 4]))
+	(is (= 4 (get-version-number))))
+
+	
 
 (use-fixtures :each create-db-fixture create-file-fixture)
 

@@ -1,8 +1,8 @@
 Done:			
-
-TODO:
 	DB Onion should automatically update your version number
 	Reads scripts from disk and applies them in order to a db
+
+TODO:
 	If you're missing a version you have 1,2,4 provide error feedback!
 	build a jar of db onion
 	create ant task for db onion - If there was error feedback stop build?
@@ -13,5 +13,8 @@ TODO:
 	On exception don't commit the script + don't process future scripts
 	Apply only scripts that need to be applied (if version is at 4 start applying script 5)
 	When everything works print "yay we applied n-n'"
+	Fix closing statements when we are done with them
+	Should script-file-filter do both file name and script version filtering?  Or can we split that in to two parts.  If so, un-comment deftest test-script-file-filter.
+	
 
 
