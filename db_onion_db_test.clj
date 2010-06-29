@@ -1,13 +1,42 @@
 (ns db-onion-db-test
-  (:use clojure.test db-onion)
+  (:use clojure.test db-onion clojure.contrib.sql)
   (:import 
-     (java.sql Connection DriverManager Statement)
      (java.io File FileWriter)))
 
-(Class/forName "org.h2.Driver")
+(def db {:classname   "org.h2.Driver" ; must be in classpath
+           :subprotocol "h2"
+           :subname "mem:mytest"
+           ; Any additional keys are passed to the driver
+           ; as driver-specific properties.
+           :user     "sa"
+           :password ""})
 
-(dosync
-	(ref-set con (DriverManager/getConnection "jdbc:h2:mem:mytest","sa","")))
+(defn create-version-table
+  []
+  (create-table
+    :version
+    [:version :integer]))
+
+(defn create-script-numbers-table
+  []
+  (create-table
+    :script_numbers
+    [:script_number :integer]
+		[:insertion_time :timestamp "default current_timestamp"]))
+
+(defn initialize-version
+	[] (insert-values
+	   		:version
+			  [:version]
+			  [0]))
+
+(defn set-version
+	[num] (update-values
+						:version ["1=?" 1] {:version num}))
+
+(defn drop-all-objects
+	[]
+	(do-commands "drop all objects;"))
 
 (def db-onion-test-dir "db-onion-test-dir")
 
@@ -17,17 +46,19 @@
 	  (def writer (FileWriter. script-file))
 	  (.write writer contents)
 	  (.close writer))
-
-
-
+	
 (defn create-db-fixture [test-fn]
-	(def sst (.createStatement @con))
-	(.execute sst "CREATE TABLE version (version INTEGER)")
-	(.execute sst "INSERT INTO version values (0)")
-	(.execute sst "CREATE TABLE script_numbers (script_number INTEGER, insertion_time TIMESTAMP default current_timestamp)")
+	(with-connection
+	  db
+	  (transaction
+	    (create-version-table)
+			(initialize-version)
+			(create-script-numbers-table)))
 	(test-fn)
-	(.execute sst "drop all objects;")
-	(.close sst))
+  (with-connection
+	  db
+	  (transaction
+			(drop-all-objects))))
 
 (defn create-file-fixture [test-fn]
   (def test-dir (File. db-onion-test-dir))
@@ -39,19 +70,19 @@
   (test-fn)
 	(doseq [test-file (.listFiles test-dir)]
 		(.delete test-file))
-  (.delete test-dir)
-)
-
-(defn initialize-version [number]
-	(.execute sst (str "update version set version=" number)))
-
+  (.delete test-dir))
+					
 (defn get-ran-script-nums []
-	(let [rs (.executeQuery sst "SELECT script_number from script_numbers order by insertion_time")]
-				(loop [results []]
-					(if (not (.next rs))
-						results
-						(recur (conj results (.getObject rs "script_number")))
-					))))
+	(with-connection 
+		db
+		(with-query-results rs ["SELECT script_number from script_numbers order by insertion_time"]
+			(doall (map #(:script_number %) rs)))))
+
+(defn print-version []
+	(with-connection 
+		db
+		(with-query-results rs ["select * from version"]
+			(dorun (map #(println (:version %)) rs)))))
 
 (deftest apply-all-scripts
   (run db-onion-test-dir)
@@ -59,12 +90,13 @@
 	(is (= 4 (get-version-number)))))
 
 (deftest apply-scripts-3-and-4-when-version-starts-at-2
-	(initialize-version 2)
+	(with-connection
+	  db
+	  (transaction
+			(set-version 2)))
   (run db-onion-test-dir)
 	(is (= (get-ran-script-nums) [3 4]))
 	(is (= 4 (get-version-number))))
-
-	
 
 (use-fixtures :each create-db-fixture create-file-fixture)
 

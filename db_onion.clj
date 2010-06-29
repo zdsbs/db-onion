@@ -1,7 +1,11 @@
 (ns db-onion
-  (:import (java.io File FilenameFilter) (java.util Comparator)))
+	(:use clojure.contrib.sql)
+  (:import (java.sql Connection DriverManager Statement) (java.io File FilenameFilter) (java.util Comparator)))
 
 (def con (ref nil))
+
+(dosync
+	(ref-set con (DriverManager/getConnection "jdbc:h2:mem:mytest","sa","")))
 
 (defn get-statement []
 	(.createStatement @con))
