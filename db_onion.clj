@@ -2,19 +2,14 @@
 	(:use clojure.contrib.sql)
   (:import (java.sql Connection DriverManager Statement) (java.io File FilenameFilter) (java.util Comparator)))
 
-(def con (ref nil))
-
-(dosync
-	(ref-set con (DriverManager/getConnection "jdbc:h2:mem:mytest","sa","")))
-
-(defn get-statement []
-	(.createStatement @con))
+(def db (ref nil))
 
 (defn get-version-number []
-	(let [sst (get-statement)
-				rs (.executeQuery sst "select version from version")]
-				(.next rs)
-				(.getObject rs "version")))
+		(with-connection @db
+			(transaction 
+				(with-query-results rs ["SELECT version from version"]
+				(first (doall (map #(:version %) rs)))))))
+
 
 (def script-file-filter 
   (proxy [FilenameFilter] []
@@ -37,15 +32,18 @@
 (defn get-script-contents [script-dir-path]
 	(map slurp (map #(.getAbsolutePath %) (get-scripts script-dir-path))))
 
+(defn set-version
+	[num] (update-values
+						:version ["1=?" 1] {:version num}))
+
 (defn inc-version []
-	(let [sst (get-statement)
-				new-version (inc (get-version-number))]
-		(.execute sst (str "update version set version=" new-version))))
+	(set-version (inc (get-version-number))))
 
 (defn run [script-dir-path]
-  (let [sst (get-statement)
-			  scripts-contents (get-script-contents script-dir-path)]
+  (let [scripts-contents (get-script-contents script-dir-path)]
 				(doseq [script scripts-contents]
-					(.execute sst script)
-					(inc-version))
-    		(.close sst)))
+					(with-connection
+						@db
+						(transaction
+							(do-commands script)
+							(inc-version))))))

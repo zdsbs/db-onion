@@ -3,13 +3,18 @@
   (:import 
      (java.io File FileWriter)))
 
-(def db {:classname   "org.h2.Driver" ; must be in classpath
-           :subprotocol "h2"
-           :subname "mem:mytest"
-           ; Any additional keys are passed to the driver
-           ; as driver-specific properties.
-           :user     "sa"
-           :password ""})
+(dosync (ref-set db
+	{:classname   "org.h2.Driver" ; must be in classpath
+			           :subprotocol "h2"
+			           :subname "mem:mytest"
+			           ; Any additional keys are passed to the driver
+			           ; as driver-specific properties.
+			           :user     "sa"
+			           :password ""}))
+
+(defn keep-alive
+	[]
+	(do-commands "set db_close_delay -1"))
 
 (defn create-version-table
   []
@@ -30,15 +35,16 @@
 			  [:version]
 			  [0]))
 
-(defn set-version
-	[num] (update-values
-						:version ["1=?" 1] {:version num}))
-
 (defn drop-all-objects
 	[]
 	(do-commands "drop all objects;"))
 
 (def db-onion-test-dir "db-onion-test-dir")
+
+
+
+
+
 
 (defn create-script[name contents]
 	  (def script-file (File. (str db-onion-test-dir "/" name)))
@@ -49,16 +55,13 @@
 	
 (defn create-db-fixture [test-fn]
 	(with-connection
-	  db
+	  @db
 	  (transaction
 	    (create-version-table)
 			(initialize-version)
-			(create-script-numbers-table)))
-	(test-fn)
-  (with-connection
-	  db
-	  (transaction
-			(drop-all-objects))))
+			(create-script-numbers-table)
+			(test-fn)
+		  (drop-all-objects))))
 
 (defn create-file-fixture [test-fn]
   (def test-dir (File. db-onion-test-dir))
@@ -74,13 +77,14 @@
 					
 (defn get-ran-script-nums []
 	(with-connection 
-		db
-		(with-query-results rs ["SELECT script_number from script_numbers order by insertion_time"]
-			(doall (map #(:script_number %) rs)))))
-
+		@db
+		(transaction 
+			(with-query-results rs ["SELECT script_number from script_numbers order by insertion_time"]
+				(doall (map #(:script_number %) rs))))))
+		
 (defn print-version []
 	(with-connection 
-		db
+		@db
 		(with-query-results rs ["select * from version"]
 			(dorun (map #(println (:version %)) rs)))))
 
@@ -91,7 +95,7 @@
 
 (deftest apply-scripts-3-and-4-when-version-starts-at-2
 	(with-connection
-	  db
+	  @db
 	  (transaction
 			(set-version 2)))
   (run db-onion-test-dir)
