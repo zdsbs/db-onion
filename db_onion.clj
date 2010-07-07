@@ -5,10 +5,10 @@
 (def db (ref nil))
 
 (defn get-version-number []
-		(with-connection @db
-			(transaction 
-				(with-query-results rs ["SELECT version from version"]
-				(first (doall (map #(:version %) rs)))))))
+  (with-connection @db
+    (transaction 
+      (with-query-results rs ["SELECT version from version"]
+      (first (doall (map #(:version %) rs)))))))
 
 
 (def script-file-filter 
@@ -34,16 +34,16 @@
 
 (defn set-version
 	[num] (update-values
-						:version ["1=?" 1] {:version num}))
+          :version ["1=?" 1] {:version num}))
 
 (defn inc-version []
 	(set-version (inc (get-version-number))))
 
 (defn run [script-dir-path]
   (let [scripts-contents (get-script-contents script-dir-path)]
-				(doseq [script scripts-contents]
-					(with-connection
-						@db
-						(transaction
-							(do-commands script)
-							(inc-version))))))
+    (doseq [script scripts-contents]
+    (with-connection
+            @db
+            (transaction
+                    (do-commands script)
+                    (inc-version))))))
