@@ -2,6 +2,8 @@ Done:
 	DB Onion should automatically update your version number
 	Apply only scripts that need to be applied (if version is at 4 start applying script 5)
 	Reads scripts from disk and applies them in order to a db
+	Commit after each script
+	On exception don't commit the script + don't process future scripts
 
 TODO:
 	If you're missing a version you have 1,2,4 provide error feedback!
@@ -10,10 +12,8 @@ TODO:
 	configure db connection information
 	If DB is not configured to be versioned (ie no version table) provide error feedback	
 	Specifying / configuring the script directory
-	Commit after each script
-	On exception don't commit the script + don't process future scripts
 	When everything works print "yay we applied n-n'"
 	Should script-file-filter do both file name and script version filtering?  Or can we split that in to two parts.  If so, un-comment deftest test-script-file-filter.
-	
+	Rename db-onion-db-test
 
 

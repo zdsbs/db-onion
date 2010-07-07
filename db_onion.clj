@@ -1,6 +1,6 @@
 (ns db-onion
-	(:use clojure.contrib.sql)
-  (:import (java.sql Connection DriverManager Statement) (java.io File FilenameFilter) (java.util Comparator)))
+  (:use clojure.contrib.sql)
+  (:import (java.sql Connection DriverManager Statement ) (java.io File FilenameFilter) (java.util Comparator)))
 
 (def db (ref nil))
 
@@ -39,11 +39,20 @@
 (defn inc-version []
 	(set-version (inc (get-version-number))))
 
+(defn apply-single-script [script]
+    (with-connection
+       @db
+       (transaction
+         (do-commands script)
+         (inc-version))))
+    
+
+(defn apply-all-scripts[all-scripts]
+  (doseq [script all-scripts]
+      (apply-single-script script)))
+
 (defn run [script-dir-path]
   (let [scripts-contents (get-script-contents script-dir-path)]
-    (doseq [script scripts-contents]
-    (with-connection
-            @db
-            (transaction
-                    (do-commands script)
-                    (inc-version))))))
+    (try 
+      (apply-all-scripts scripts-contents)
+      (catch Exception sql ))))
