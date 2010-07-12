@@ -1,4 +1,4 @@
-(ns exceptions-test
+(ns invalid-sql-file-test 
   (:use clojure.test db-onion clojure.contrib.sql test-file-functions test-db-functions)
   (:import 
      (java.io File FileWriter)))
@@ -17,4 +17,4 @@
 
 (use-fixtures :each db-fixture (files-fixture create-unhappy-files))
 
-(run-tests 'exceptions-test)
+(run-tests 'invalid-sql-file-test)

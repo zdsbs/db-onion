@@ -1,4 +1,4 @@
-(ns db-onion-db-test
+(ns can-apply-scripts-in-order-test
   (:use clojure.test db-onion clojure.contrib.sql test-file-functions test-db-functions)
   (:import 
      (java.io File FileWriter)))
@@ -24,4 +24,4 @@
 
 (use-fixtures :each db-fixture (files-fixture create-happy-path-files))
 
-(run-tests 'db-onion-db-test)
+(run-tests 'can-apply-scripts-in-order-test)
