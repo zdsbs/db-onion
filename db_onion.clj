@@ -10,6 +10,21 @@
       (with-query-results rs ["SELECT version from version"]
       (first (doall (map #(:version %) rs)))))))
 
+(defn version-table-missing? []
+  (try 
+    (get-version-number)
+    false
+    (catch Exception sql true)))
+
+(defn set-version
+	[num] (update-values
+          :version ["1=?" 1] {:version num}))
+
+(defn inc-version []
+	(set-version (inc (get-version-number))))
+
+
+;;;;;i/o
 (defn get-version-number-from-filename [filename]
   (Integer/parseInt (first (.split filename "-"))))
 
@@ -21,10 +36,10 @@
     false
     (> (get-version-number-from-filename filename) current-version)))
 
-(def script-file-filter 
+(defn get-script-file-filter [version-number]
   (proxy [FilenameFilter] []
     (accept [_ filename] 
-          (is-valid-filename-over-version? filename (get-version-number)))))
+          (is-valid-filename-over-version? filename version-number))))
 
 (def numeric-sort-comparator 
   (proxy [Comparator] []
@@ -33,26 +48,15 @@
 			  file2-number (Integer/parseInt (re-find #"[0-9]+" (.getName file2)))]
 			  (.compareTo file1-number file2-number)))))
 
-(defn get-scripts [script-dir-path]
+(defn get-scripts [script-dir-path version-number]
     (let [onion (new File script-dir-path)]
-         (sort numeric-sort-comparator (seq (.listFiles onion script-file-filter)))))
+         (sort numeric-sort-comparator (seq (.listFiles onion (get-script-file-filter version-number))))))
 	
 (defn get-script-contents [scripts]
 	(map slurp (map #(.getAbsolutePath %) scripts)))
 
-(defn set-version
-	[num] (update-values
-          :version ["1=?" 1] {:version num}))
-
-(defn inc-version []
-	(set-version (inc (get-version-number))))
-
-(defn apply-single-script [script]
-    (with-connection
-       @db
-       (transaction
-         (do-commands script)
-         (inc-version))))
+(defn get-file-names [files]
+  (map #(.getName %) files))
 
 (defn script-name-list-has-holes? [script-file-names current-version]
   (loop [names script-file-names last-version current-version]
@@ -62,18 +66,26 @@
         true
         (recur (rest names) (get-version-number-from-filename (first names)))))))
 
-(defn get-file-names [files]
-  (map #(.getName %) files))
+;;run
+
+(defn apply-single-script [script]
+    (with-connection
+       @db
+       (transaction
+         (do-commands script)
+         (inc-version))))
 
 (defn apply-all-scripts[all-scripts]
   (doseq [script all-scripts]
       (apply-single-script script)))
 
 (defn run [script-dir-path]
-  (let [scripts (get-scripts script-dir-path)
-        scripts-contents (get-script-contents scripts)]
-    (if (script-name-list-has-holes? (get-file-names scripts) (get-version-number))
-      (throw (IllegalArgumentException. "foo"))
-      (try 
-        (apply-all-scripts scripts-contents)
-        (catch Exception sql )))))
+  (if (version-table-missing?)
+    (throw (IllegalStateException. "bad"))
+    (let [scripts (get-scripts script-dir-path (get-version-number))
+          scripts-contents (get-script-contents scripts)]
+      (if (script-name-list-has-holes? (get-file-names scripts) (get-version-number))
+        (throw (IllegalArgumentException. "foo"))
+        (try 
+          (apply-all-scripts scripts-contents)
+          (catch Exception sql ))))))

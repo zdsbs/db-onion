@@ -5,7 +5,7 @@
 
 (init-db-ref)
 
-(defn create-happy-path-files []
+(defn can-apply-scripts-in-order-files []
   (create-script "1-script.sql" "INSERT INTO script_numbers (script_number) values (1)")
   (create-script "2-script.sql" "INSERT INTO script_numbers (script_number) values (2)")
   (create-script "3-script.sql" "INSERT INTO script_numbers (script_number) values (3)")
@@ -22,6 +22,6 @@
 	(is (= (get-ran-script-nums) [3 4]))
 	(is (= 4 (get-version-number))))
 
-(use-fixtures :each db-fixture (files-fixture create-happy-path-files))
+(use-fixtures :each db-fixture (files-fixture can-apply-scripts-in-order-files))
 
 (run-tests 'can-apply-scripts-in-order-test)

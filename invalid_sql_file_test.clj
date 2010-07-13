@@ -5,7 +5,7 @@
 
 (init-db-ref)
 
-(defn create-unhappy-files []
+(defn invalid-sql-file-files []
   (create-script "1-script.sql" "INSERT INTO script_numbers (script_number) values (1);")
   (create-script "2-script.sql" "INVALID SQL")
   (create-script "3-script.sql" "INSERT INTO script_numbers (script_number) values (3);"))
@@ -15,6 +15,6 @@
 	(is (= (get-ran-script-nums) [1])
 	(is (= 1 (get-version-number)))))
 
-(use-fixtures :each db-fixture (files-fixture create-unhappy-files))
+(use-fixtures :each db-fixture (files-fixture invalid-sql-file-files))
 
 (run-tests 'invalid-sql-file-test)
