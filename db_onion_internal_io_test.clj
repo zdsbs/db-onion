@@ -1,5 +1,5 @@
-(ns db-onion-test
-  (:use clojure.test db-onion)
+(ns db-onion-internal-io-test
+  (:use clojure.test db-onion-internal-io)
   (:import (java.io File FilenameFilter)))
 
 (def onion-test-path "db-onion/test-scripts")
@@ -18,4 +18,4 @@
   (is (true? (script-name-list-has-holes? (list "7-foo" "8-foo") 5)))
   )
 
-(run-tests 'db-onion-test)
+(run-tests 'db-onion-internal-io-test)
