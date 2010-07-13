@@ -10,13 +10,21 @@
       (with-query-results rs ["SELECT version from version"]
       (first (doall (map #(:version %) rs)))))))
 
+(defn get-version-number-from-filename [filename]
+  (Integer/parseInt (first (.split filename "-"))))
+
+(defn is-not-valid-filename? [filename] 
+  (nil? (re-find #"^[0-9]+-.*sql$" filename)))
+
+(defn is-valid-filename-over-version? [filename current-version]
+  (if (is-not-valid-filename? filename)
+    false
+    (> (get-version-number-from-filename filename) current-version)))
 
 (def script-file-filter 
   (proxy [FilenameFilter] []
     (accept [_ filename] 
-          (if (nil? (re-find #"^[0-9]+-.*sql$" filename))
-            false
-            (> (Integer/parseInt (first (.split filename "-"))) (get-version-number))))))
+          (is-valid-filename-over-version? filename (get-version-number)))))
 
 (def numeric-sort-comparator 
   (proxy [Comparator] []
@@ -29,8 +37,8 @@
     (let [onion (new File script-dir-path)]
          (sort numeric-sort-comparator (seq (.listFiles onion script-file-filter)))))
 	
-(defn get-script-contents [script-dir-path]
-	(map slurp (map #(.getAbsolutePath %) (get-scripts script-dir-path))))
+(defn get-script-contents [scripts]
+	(map slurp (map #(.getAbsolutePath %) scripts)))
 
 (defn set-version
 	[num] (update-values
@@ -45,14 +53,27 @@
        (transaction
          (do-commands script)
          (inc-version))))
-    
+
+(defn script-name-list-has-holes? [script-file-names current-version]
+  (loop [names script-file-names last-version current-version]
+    (if (empty? names)
+      false
+      (if (not (= (get-version-number-from-filename (first names)) (inc last-version)))
+        true
+        (recur (rest names) (get-version-number-from-filename (first names)))))))
+
+(defn get-file-names [files]
+  (map #(.getName %) files))
 
 (defn apply-all-scripts[all-scripts]
   (doseq [script all-scripts]
       (apply-single-script script)))
 
 (defn run [script-dir-path]
-  (let [scripts-contents (get-script-contents script-dir-path)]
-    (try 
-      (apply-all-scripts scripts-contents)
-      (catch Exception sql ))))
+  (let [scripts (get-scripts script-dir-path)
+        scripts-contents (get-script-contents scripts)]
+    (if (script-name-list-has-holes? (get-file-names scripts) (get-version-number))
+      (throw (IllegalArgumentException. "foo"))
+      (try 
+        (apply-all-scripts scripts-contents)
+        (catch Exception sql )))))

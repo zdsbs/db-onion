@@ -4,9 +4,9 @@ Done:
 	Reads scripts from disk and applies them in order to a db
 	Commit after each script
 	On exception don't commit the script + don't process future scripts
+  If you're missing a version you have 1,2,4 provide error feedback!
 
 TODO:
-	If you're missing a version you have 1,2,4 provide error feedback!
 	If DB is not configured to be versioned (ie no version table) provide error feedback	
 	When everything works print "yay we applied n-n'"
 	build a jar of db onion
@@ -14,6 +14,8 @@ TODO:
 	configure db connection information
 	Specifying / configuring the script directory
 
+  refactor db-onion to split into multiple files one, maybe one dealing with file i/o another with db stuff
+  
 	Should script-file-filter do both file name and script version filtering?  Or can we split that in to two parts.  If so, un-comment deftest test-script-file-filter.
 
 

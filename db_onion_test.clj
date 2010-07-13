@@ -11,17 +11,11 @@
 		  (is (= 1 (.compare numeric-sort-comparator file2 file1)))
 		  (is (= 0 (.compare numeric-sort-comparator file1 file1)))))
 
-;(deftest test-script-file-filter
-;	(let [dir (File. "unused")]
-;		(is (.accept script-file-filter dir "1-script.sql"))
-;		(is (.accept script-file-filter dir "100-script.sql"))
-;		(is (not (.accept script-file-filter dir "1-script.sql.bak")))
-;		(is (not (.accept script-file-filter dir "-1-script.sql")))
-;		(is (not (.accept script-file-filter dir "abc-script.sql")))
-;		))
-
-(deftest get-scripts-test
-         (is (= (list "1-example.sql" "4-example.sql" "123-example.sql" ) (map #(.getName %) (get-scripts onion-test-path))))
-         )
+(deftest script-name-list-has-holes-test
+  (is (false? (script-name-list-has-holes? (list "1-foo") 0)))
+  (is (false? (script-name-list-has-holes? (list "1-foo" "2-foo") 0)))
+  (is (true? (script-name-list-has-holes? (list "1-foo" "3-foo") 0)))
+  (is (true? (script-name-list-has-holes? (list "7-foo" "8-foo") 5)))
+  )
 
 (run-tests 'db-onion-test)
