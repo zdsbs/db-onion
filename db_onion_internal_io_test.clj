@@ -1,6 +1,6 @@
 (ns db-onion-internal-io-test
   (:use clojure.test db-onion-internal-io)
-  (:import (java.io File FilenameFilter)))
+  (:import (java.io File)))
 
 (def onion-test-path "db-onion/test-scripts")
 

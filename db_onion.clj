@@ -35,17 +35,23 @@
 
 (defn check-version-table-exists []
   (if (version-table-missing?)
-    (throw (IllegalStateException. "bad"))))
+    (throw (IllegalStateException. "Version table missing from database."))))
 
 (defn check-script-names-correct [scripts]
   (if (script-name-list-has-holes? (get-file-names scripts) (get-version-number))
-    (throw (IllegalArgumentException. "foo"))))
+    (throw (IllegalArgumentException. "Script file numbers not contiguous."))))
+
+(defn get-success-message [script-version-numbers]
+  (str "Yay! We applied " (first script-version-numbers) "-" (last script-version-numbers)))
 
 (defn run [script-dir-path]
   (check-version-table-exists)
   (let [scripts (get-scripts script-dir-path (get-version-number))
+        script-version-numbers (map get-version-number-from-filename (get-file-names scripts))
         scripts-contents (get-script-contents scripts)]
     (check-script-names-correct scripts)
     (try 
       (apply-all-scripts scripts-contents)
-      (catch Exception sql ))))
+      (catch Exception sql ))
+    (get-success-message script-version-numbers)
+    ))

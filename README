@@ -6,16 +6,15 @@ Done:
 	On exception don't commit the script + don't process future scripts
   If you're missing a version you have 1,2,4 provide error feedback!
   If DB is not configured to be versioned (ie no version table) provide error feedback
+  refactor db-onion to split into multiple files one, maybe one dealing with file i/o another with db stuff
+  When everything works print "yay we applied n-n'"
 
-TODO:
-	When everything works print "yay we applied n-n'"
+TODO:	
 	build a jar of db onion
 	create ant task for db onion - If there was error feedback stop build?
 	configure db connection information
 	Specifying / configuring the script directory
 
-  refactor db-onion to split into multiple files one, maybe one dealing with file i/o another with db stuff
-  
 	Should script-file-filter do both file name and script version filtering?  Or can we split that in to two parts.  If so, un-comment deftest test-script-file-filter.
 
 

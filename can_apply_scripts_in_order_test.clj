@@ -1,7 +1,5 @@
 (ns can-apply-scripts-in-order-test
-  (:use clojure.test db-onion clojure.contrib.sql test-file-functions test-db-functions)
-  (:import 
-     (java.io File FileWriter)))
+  (:use clojure.test db-onion clojure.contrib.sql test-file-functions test-db-functions))
 
 (init-db-ref)
 
