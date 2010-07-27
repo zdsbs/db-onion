@@ -2,8 +2,6 @@
   (:use clojure.test db-onion-internal-io)
   (:import (java.io File)))
 
-(def onion-test-path "db-onion/test-scripts")
-
 (deftest test-numeric-sort-comparator
 	(let [file1 (File. "1-foo.sql")
 		  file2 (File. "2-foo.sql")]
