@@ -8,9 +8,9 @@ Done:
   If DB is not configured to be versioned (ie no version table) provide error feedback
   refactor db-onion to split into multiple files one, maybe one dealing with file i/o another with db stuff
   When everything works print "yay we applied n-n'"
+	Build a jar (via leiningen)
 
 TODO:	
-	build a jar of db onion
 	create ant task for db onion - If there was error feedback stop build?
 	configure db connection information
 	Specifying / configuring the script directory
