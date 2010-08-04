@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<project name="OwnTaskExample" default="main" basedir=".">
+
+	<taskdef name="mytask" classname="AntTask" />
+
+	<target name="main" >
+		<mytask/>
+	</target>
+</project>
+
