@@ -5,7 +5,12 @@
 	<taskdef name="mytask" classname="AntTask" />
 
 	<target name="main" >
-		<mytask/>
+		<mytask
+		    driverClassName="dcn"
+		    subprotocol="sp"
+		    subname="sn"
+		    username="usr"
+		    password="pwd"/>
 	</target>
 </project>
 

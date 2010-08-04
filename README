@@ -9,11 +9,13 @@ Done:
   refactor db-onion to split into multiple files one, maybe one dealing with file i/o another with db stuff
   When everything works print "yay we applied n-n'"
 	Build a jar (via leiningen)
+	configure db connection information
 
 TODO:	
-	create ant task for db onion - If there was error feedback stop build?
-	configure db connection information
+	create ant task for db onion - Need to call through to the actual DBOnion
+	If there was error feedback stop build?
 	Specifying / configuring the script directory
+	Check that we really work against an actual database
 
 	Should script-file-filter do both file name and script version filtering?  Or can we split that in to two parts.  If so, un-comment deftest test-script-file-filter.
 
