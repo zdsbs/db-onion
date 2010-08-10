@@ -42,3 +42,8 @@
       (if (not (= (get-version-number-from-filename (first names)) (inc last-version)))
         true
         (recur (rest names) (get-version-number-from-filename (first names)))))))
+
+
+(defn dir-exists? [path]
+  (.exists (File. path)))
+    

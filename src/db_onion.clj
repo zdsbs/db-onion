@@ -40,6 +40,10 @@
   (if (version-table-missing?)
     (throw (IllegalStateException. "Version table missing from database."))))
 
+(defn check-script-dir-exists [path]
+  (if (not (dir-exists? path))
+    (throw (IllegalArgumentException. "Could not find specified script directory.  Please check your configuration."))))
+
 (defn check-script-names-correct [scripts]
   (if (script-name-list-has-holes? (get-file-names scripts) (get-version-number))
     (throw (IllegalArgumentException. "Script file numbers not contiguous."))))
@@ -49,8 +53,12 @@
     "DB up to date with latest scripts.  Already up to date."
     (str "Yay! We applied " (first script-version-numbers) "-" (last script-version-numbers))))
 
-(defn run [script-dir-path]
+(defn check-dependencies [script-dir-path]
   (check-version-table-exists)
+  (check-script-dir-exists script-dir-path))
+
+(defn run [script-dir-path]
+  (check-dependencies script-dir-path)
   (let [scripts (get-scripts script-dir-path (get-version-number))
         script-version-numbers (map get-version-number-from-filename (get-file-names scripts))
         scripts-contents (get-script-contents scripts)]
