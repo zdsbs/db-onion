@@ -10,7 +10,8 @@
 		    subprotocol="h2"
 		    subname="~/test"
 		    username="sa"
-		    password=""/>
+		    password=""
+		    scriptPath="/Users/danielpierkowski/dev/clojure/db-onion-scripts"/>
 	</target>
 </project>
 

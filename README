@@ -10,12 +10,12 @@ Done:
   When everything works print "yay we applied n-n'"
 	Build a jar (via leiningen)
 	configure db connection information
+  Check that we really work against an actual database
+  create ant task for db onion - Need to call through to the actual DBOnion
+	Specifying / configuring the script directory
 
 TODO:	
-	create ant task for db onion - Need to call through to the actual DBOnion
-	If there was error feedback stop build?
-	Specifying / configuring the script directory
-	Check that we really work against an actual database
+	If there was an error stop the (Ant) build? -- Echo 'Hello World' from ANT; then run the task with an intentional error
 	Add ant task to create version table
   When DB Onion is pointed at a non-existent script directory, provide some feedback.
   Provide feedback if DB Onion is run and no scripts need to be applied.
