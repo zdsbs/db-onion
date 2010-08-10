@@ -15,14 +15,15 @@ Done:
 	Specifying / configuring the script directory
   Provide feedback if DB Onion is run and no scripts need to be applied.
   When DB Onion is pointed at a non-existent script directory, provide some feedback.
+  Add ant task to create version table
 
 TODO:	
 	If there was an error stop the (Ant) build? -- Echo 'Hello World' from ANT; then run the task with an intentional error
-	Add ant task to create version table
+	Initialize task should provide nicer feedback on error/exception
   Need better error handling/reporting when connecting to the DB.  version-table-missing? treats any exception as if the version table didn't exist.
   Fix DB Onion to either not need the version initialized to 0, or to provide some useful error message otherwise.
   'Success' message incorrect when one or more scripts don't complete successfully.
-
+  Configure version table name - Maybe you already have a version table
 	Should script-file-filter do both file name and script version filtering?  Or can we split that in to two parts.  If so, un-comment deftest test-script-file-filter.
 
 

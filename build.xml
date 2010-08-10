@@ -2,10 +2,21 @@
 
 <project name="OwnTaskExample" default="main" basedir=".">
 
-	<taskdef name="mytask" classname="AntTask" />
+	<taskdef name="runscripts" classname="DBOnionScriptRunner" />
+	<taskdef name="initialize" classname="DBOnionInitializer" />
+
+  <target name="init">
+		<initialize
+		    driverClassName="org.h2.Driver"
+		    subprotocol="h2"
+		    subname="~/test"
+		    username="sa"
+		    password=""
+		    versionTableName="version"/>
+  </target>
 
 	<target name="main" >
-		<mytask
+		<runscripts
 		    driverClassName="org.h2.Driver"
 		    subprotocol="h2"
 		    subname="~/test"

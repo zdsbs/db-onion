@@ -1,4 +1,4 @@
-(ns AntTask
+(ns DBOnionScriptRunner
   (:use db-onion)
   (:gen-class
     :extends org.apache.tools.ant.Task
@@ -35,7 +35,7 @@
 
 
 (defn -execute [this] 
-  (println "Executing DB-Onion with")
+  (println "Executing DB-Onion")
   (dosync (ref-set db @db-props))
   (println (run @script-path))) 
 

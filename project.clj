@@ -4,4 +4,4 @@
                  [org.clojure/clojure-contrib "1.2.0-beta1"]
                  [com.h2database/h2 "1.2.138"]
                  [ant/ant "1.7.0"]]
-  :aot [AntTask])
+  :aot [DBOnionScriptRunner DBOnionInitializer])

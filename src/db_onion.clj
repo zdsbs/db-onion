@@ -1,5 +1,5 @@
 (ns db-onion
-  (:use clojure.contrib.sql db-onion-internal-io))
+  (:use clojure.contrib.sql db-onion-internal-io db-onion-internal-db))
 
 (def db (ref nil))
 
@@ -68,3 +68,10 @@
       (catch Exception sql (println sql)))
     (get-success-message script-version-numbers)
     ))
+
+(defn initialize-version-table[]
+  (with-connection
+    @db
+    (transaction
+    (create-version-table)
+    (initialize-version))))

@@ -10,24 +10,11 @@
            :user     "sa"
            :password ""})))
 
-
-(defn create-version-table
-    []
-    (create-table
-          :version
-          [:version :integer]))
-
 (defn create-script-numbers-table []
   (create-table
     :script_numbers
     [:script_number :integer]
     [:insertion_time :timestamp "default current_timestamp"]))
-
-(defn initialize-version[] 
-  (insert-values
-   :version
-   [:version]
-   [0]))
 
 (defn drop-all-objects []
   (do-commands "drop all objects;"))
@@ -36,8 +23,7 @@
   (with-connection
     @db
     (transaction
-      (create-version-table)
-      (initialize-version)
+      (initialize-version-table)
       (create-script-numbers-table))))
 
 (defn drop-db []
