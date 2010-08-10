@@ -13,7 +13,10 @@
   (try 
     (get-version-number)
     false
-    (catch Exception sql true)))
+    (catch Exception sql 
+      (do 
+        (println sql)
+        true))))
 
 (defn set-version [num] 
   (update-values
@@ -52,6 +55,6 @@
     (check-script-names-correct scripts)
     (try 
       (apply-all-scripts scripts-contents)
-      (catch Exception sql ))
+      (catch Exception sql (println sql)))
     (get-success-message script-version-numbers)
     ))

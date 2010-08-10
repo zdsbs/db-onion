@@ -6,11 +6,11 @@
 
 	<target name="main" >
 		<mytask
-		    driverClassName="dcn"
-		    subprotocol="sp"
-		    subname="sn"
-		    username="usr"
-		    password="pwd"/>
+		    driverClassName="org.h2.Driver"
+		    subprotocol="h2"
+		    subname="~/test"
+		    username="sa"
+		    password=""/>
 	</target>
 </project>
 

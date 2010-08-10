@@ -16,6 +16,7 @@ TODO:
 	If there was error feedback stop build?
 	Specifying / configuring the script directory
 	Check that we really work against an actual database
+	Add ant task to create version table
 
 	Should script-file-filter do both file name and script version filtering?  Or can we split that in to two parts.  If so, un-comment deftest test-script-file-filter.
 

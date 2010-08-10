@@ -1,4 +1,5 @@
 (ns AntTask
+  (:use db-onion)
   (:gen-class
     :extends org.apache.tools.ant.Task
     :methods [[setDriverClassName [String] void]
@@ -14,19 +15,22 @@
 
 
 (defn -setSubprotocol [this subprotocol]
-(dosync (alter db-props assoc :subprotocol subprotocol)))
+  (dosync (alter db-props assoc :subprotocol subprotocol)))
 
 (defn -setSubname [this subname]
-(dosync (alter db-props assoc :subname subname)))
+  (dosync (alter db-props assoc :subname subname)))
 
 
 (defn -setUsername [this username]
-(dosync (alter db-props assoc :user username)))
+  (dosync (alter db-props assoc :user username)))
 
 (defn -setPassword [this password]
-(dosync (alter db-props assoc :password password)))
+  (dosync (alter db-props assoc :password password)))
 
 (defn -execute [this] 
   (println "Executing DB-Onion with")
-  (println @db-props)) 
+  (dosync (ref-set db @db-props))
+  (println (run "/home/zshaw/onion-scripts"))) 
+
+
 
