@@ -13,12 +13,12 @@ Done:
   Check that we really work against an actual database
   create ant task for db onion - Need to call through to the actual DBOnion
 	Specifying / configuring the script directory
+Provide feedback if DB Onion is run and no scripts need to be applied.
 
 TODO:	
 	If there was an error stop the (Ant) build? -- Echo 'Hello World' from ANT; then run the task with an intentional error
 	Add ant task to create version table
   When DB Onion is pointed at a non-existent script directory, provide some feedback.
-  Provide feedback if DB Onion is run and no scripts need to be applied.
   Need better error handling/reporting when connecting to the DB.  version-table-missing? treats any exception as if the version table didn't exist.
   Fix DB Onion to either not need the version initialized to 0, or to provide some useful error message otherwise.
   'Success' message incorrect when one or more scripts don't complete successfully.

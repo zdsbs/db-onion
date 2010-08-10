@@ -45,7 +45,9 @@
     (throw (IllegalArgumentException. "Script file numbers not contiguous."))))
 
 (defn get-success-message [script-version-numbers]
-  (str "Yay! We applied " (first script-version-numbers) "-" (last script-version-numbers)))
+  (if (empty? script-version-numbers)
+    "DB up to date with latest scripts.  Already up to date."
+    (str "Yay! We applied " (first script-version-numbers) "-" (last script-version-numbers))))
 
 (defn run [script-dir-path]
   (check-version-table-exists)
