@@ -1,0 +1,6 @@
+1) create uberjar: >lein uberjar
+2) download h2
+3) run h2 >java -jar h2-<version>.jar
+4) initliaze the database with a version table >ant -lib db-onion<version>-standalone.jar init
+5) modify scriptPath in build.xml and put your scripts in there
+6) run >ant -lib db-onion<version>-standalone.jar
