@@ -24,5 +24,9 @@
 		    password=""
 		    scriptPath="/Users/danielpierkowski/dev/clojure/db-onion-scripts"/>
 	</target>
+	
+	<target name="hello" depends="main">
+	  <echo>Hello World!</echo>
+  </target>
 </project>
 
