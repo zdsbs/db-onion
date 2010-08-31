@@ -1,5 +1,5 @@
 (ns missing-script-file-test 
-  (:use clojure.test db-onion clojure.contrib.sql test-file-functions test-db-functions))
+  (:use clojure.test db-onion db-onion-internal-db clojure.contrib.sql test-file-functions test-db-functions))
 
 (init-db-ref)
 

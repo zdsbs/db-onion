@@ -1,29 +1,6 @@
 (ns db-onion
   (:use clojure.contrib.sql db-onion-internal-io db-onion-internal-db))
 
-(def db (ref nil))
-
-(defn get-version-number []
-  (with-connection @db
-    (transaction 
-      (with-query-results rs ["SELECT version from version"]
-      (first (doall (map #(:version %) rs)))))))
-
-(defn version-table-missing? []
-  (try 
-    (get-version-number)
-    false
-    (catch Exception sql 
-      (do 
-        (println sql)
-        true))))
-
-(defn set-version [num] 
-  (update-values
-          :version ["1=?" 1] {:version num}))
-
-(defn inc-version []
-	(set-version (inc (get-version-number))))
 
 (defn apply-single-script [script]
     (with-connection
@@ -36,9 +13,6 @@
   (doseq [script all-scripts]
       (apply-single-script script)))
 
-(defn check-version-table-exists []
-  (if (version-table-missing?)
-    (throw (IllegalStateException. "Version table missing from database."))))
 
 (defn check-script-dir-exists [path]
   (if (not (dir-exists? path))
@@ -54,7 +28,7 @@
     (str "Yay! We applied " (first script-version-numbers) "-" (last script-version-numbers))))
 
 (defn check-dependencies [script-dir-path]
-  (check-version-table-exists)
+  (throw-exception-if-version-table-is-missing)
   (check-script-dir-exists script-dir-path))
 
 (defn run [script-dir-path]
@@ -70,6 +44,7 @@
     ))
 
 (defn initialize-version-table[]
+  (throw-exception-if-version-table-already-exists)
   (with-connection
     @db
     (transaction
