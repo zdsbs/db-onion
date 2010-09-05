@@ -1,5 +1,5 @@
 (ns test-db-functions
-  (:use clojure.test db-onion db-onion-internal-db clojure.contrib.sql)
+  (:use clojure.test db-onion clojure.contrib.sql)
   (:import (java.io File FileWriter)))
 
 (defn init-db-ref []
